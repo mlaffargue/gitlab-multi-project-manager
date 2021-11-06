@@ -8,20 +8,29 @@ import Pipeline from './Pipeline';
 class PipelineAccordion extends Component {
     constructor(props) {
         super(props);
-        this.state = {  }
+        this.state = { 
+            pipelinesPerPipelineIdMap: props.pipelinesPerPipelineIdMap,
+            jobsPerPipelineIdMap: props.jobsPerPipelineIdMap
+         }
     }
     
-    createPipelinesCmps = (latestPipelineJobListCmps, othersPipelinesJobListCmps) => {
-        const pipelinesPerPipelineIdMap = this.props.pipelinesPerPipelineIdMap;
-        const jobsPerPipelineIdMap = this.props.jobsPerPipelineIdMap;
-        
+    static getDerivedStateFromProps(nextProps, prevState) {
+        return {
+            ...prevState,
+            pipelinesPerPipelineIdMap: nextProps.pipelinesPerPipelineIdMap,
+            jobsPerPipelineIdMap: nextProps.jobsPerPipelineIdMap
+        };
+    }
+
+    createPipelinesCmps = (latestPipelineJobListCmps, othersPipelinesJobListCmps) => {      
         let idx = 0;
         
-        jobsPerPipelineIdMap.forEach( (jobs, pipelineId) => {
-            const pipeline = new GitlabPipelineMdl(pipelinesPerPipelineIdMap.get(pipelineId));
+        new Map([...this.state.jobsPerPipelineIdMap].sort((a, b) => b[1] - a[1]))
+            .forEach( (jobs, pipelineId) => {
+            const pipeline = new GitlabPipelineMdl(this.state.pipelinesPerPipelineIdMap.get(pipelineId));
             const currentJobListCmps = (idx === 0) ? latestPipelineJobListCmps : othersPipelinesJobListCmps;
             currentJobListCmps.push(
-                <Pipeline key={pipeline.id} pipeline={pipeline} jobs={jobs.reverse()} hasSeparator={idx !== 0 && idx !== jobsPerPipelineIdMap.size-1}/>
+                <Pipeline key={pipeline.id} pipeline={pipeline} jobs={jobs} hasSeparator={idx !== 0 && idx !== this.state.jobsPerPipelineIdMap.size-1}/>
             )
             idx++;
         });

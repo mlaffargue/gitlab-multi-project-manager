@@ -1,16 +1,14 @@
 import { AddIcon } from '@chakra-ui/icons';
 import {
     Button, Flex, FormControl, FormLabel, IconButton, Input, Modal, ModalBody,
-    ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spacer, useDisclosure, Wrap
+    ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spacer, useDisclosure, useToast, Wrap
 } from "@chakra-ui/react";
 import React, { Component, useEffect, useRef, useState } from 'react';
 import ProjectInfo from '../components/gitlab/ProjectInfo';
-import DraftOptionEnum from '../model/DraftOptionEnum';
 import ProjectMdl from '../model/ProjectMdl';
 
-
-
 function AddProjectButton(props) {
+    const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [optionList, setOptionList] = useState([]);
     let repositories = (localStorage.getItem('repositories') && JSON.parse(localStorage.getItem('repositories')) ) || [];
@@ -32,6 +30,27 @@ function AddProjectButton(props) {
 
     const onSubmit = (event) => {
         event.preventDefault();
+        
+        let errorTitle="", errorDesc="";
+        if (selectedRepository === "") {
+            errorTitle = "Select a repository";
+            errorDesc = "Repository is missing. Go to configuration to add new.";
+        } else if (projectId.trim() === "") {
+            errorTitle = "Fill the project ID";
+            errorDesc = "Project ID is missing.";
+        }
+
+        if (errorTitle !== "") {
+            toast({
+                title: errorTitle,
+                description: errorDesc,
+                status: "error",
+                duration: 3000,
+                position: "top",
+                isClosable: true,
+              });
+              return;
+        }
         const project = new ProjectMdl();
         project.id = projectId;
         project.repository = selectedRepository;
@@ -119,7 +138,6 @@ class MrAnalysisPage extends Component {
     }
 
     render() {
-        console.log(this.state.draftOption);
         const projectCmps = this.state.projects.map(
             (project) => {
                     return <ProjectInfo key={project.id} project={project} deleteProject={this.deleteProject} draftOption={this.state.draftOption}/>

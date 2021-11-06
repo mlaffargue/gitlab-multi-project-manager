@@ -29,8 +29,6 @@ class MrInfo extends Component {
         GitlabService.getMRPipelines(this.props.project, this.props.mergeRequest.iid)
             .then((pipelines) => {
                 pipelines
-                    // Sort date desc
-                    .sort((a,b) => {return new Date(b.updated_at) - new Date(a.updated_at) })
                     // keep pipelines per pipelineId in map 
                     .forEach(pipeline => pipelinesPerPipelineId.set(pipeline.id,pipeline));
                 
@@ -39,9 +37,10 @@ class MrInfo extends Component {
                     .then (
                         (pipelineJobs) => {
                             // keep jobs per pipelineId in map 
-                            pipelineJobs.forEach((jobs) => {
+                            pipelineJobs
+                                .forEach((jobs) => {
                                 if (jobs.length > 0) {
-                                    jobsPerPipelineId.set(jobs[0].pipeline.id, jobs);
+                                    jobsPerPipelineId.set(jobs[0].pipeline.id, jobs.reverse());
                                 }
                             });
             
