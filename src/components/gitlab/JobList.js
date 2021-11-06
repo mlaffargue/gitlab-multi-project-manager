@@ -40,7 +40,7 @@ class JobList extends Component {
      */
     getIcon(status) {
         let icon = {
-            type: "BsInfoCircle",
+            type: "BiInfoCircle",
             color: "black"
         };
         

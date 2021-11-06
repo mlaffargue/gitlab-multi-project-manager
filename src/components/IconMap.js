@@ -1,14 +1,13 @@
 import React from 'react';
-import {BsInfoCircle} from 'react-icons/bs';
-import {BiPlayCircle, BiXCircle, BiErrorCircle, BiCheckCircle, BiUserCircle, BiMinusCircle, BiFastForwardCircle} from 'react-icons/bi';
+import {BiPlayCircle, BiInfoCircle, BiXCircle, BiErrorCircle, BiCheckCircle, BiUserCircle, BiMinusCircle, BiFastForwardCircle} from 'react-icons/bi';
 
 const IconMap = {
     toIcon(stringValue) {
         let icon; 
 
         switch (stringValue) {
-            case "BsInfoCircle":
-                icon = BsInfoCircle;
+            case "BiInfoCircle":
+                icon = BiInfoCircle;
                 break;
             case "BiPlayCircle":
                 icon = BiPlayCircle;
