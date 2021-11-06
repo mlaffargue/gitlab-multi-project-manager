@@ -1,6 +1,6 @@
 import { Button, IconButton } from '@chakra-ui/button';
 import Icon from '@chakra-ui/icon';
-import { Badge, Box, Center, Flex, SimpleGrid, VStack } from '@chakra-ui/layout';
+import { Badge, Box, Center, Flex, SimpleGrid, VStack, Text } from '@chakra-ui/layout';
 import React, { Component } from 'react';
 import { CgBitbucket, CgTrashEmpty } from 'react-icons/cg';
 import DraftOptionEnum from '../../model/DraftOptionEnum';
@@ -64,18 +64,18 @@ class ProjectInfo extends Component {
         );
 
         return (
-            <Box minW="min-content" maxW="27vw" width="27vw" borderWidth="1px" borderRadius="lg" bgGradient="linear(to-b, blue.700, blue.900)" >
+            <VStack minW="min-content" maxW="27vw" width="27vw" borderWidth="1px" borderRadius="lg" bgGradient="linear(to-b, blue.700, blue.900)" >
                 <SimpleGrid columns={3}>
                     <Box> </Box>
                     <Box>
                         <Center>
-                            <Badge borderRadius="full" px="2" colorScheme="brand">
-                                {this.state.projectInfo.name}
+                            <Badge textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
+                                <Text fontSize="xs" >{this.state.projectInfo.name}<br />{this.props.project.repository}</Text>
                             </Badge>
                         </Center>
                     </Box>
                     <Box textAlign="right">
-                    <IconButton icon={<CgTrashEmpty/>} 
+                        <IconButton icon={<CgTrashEmpty/>} 
                             cursor="pointer"
                             title="Delete project" 
                             size="xs" 
@@ -87,7 +87,7 @@ class ProjectInfo extends Component {
                 <Box p="3" >
                     {mrComponents}
                 </Box>
-           </Box>
+           </VStack>
         );
     }
 }

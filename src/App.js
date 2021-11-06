@@ -1,8 +1,9 @@
 import {
+  Badge,
   Box,
   Center, ChakraProvider,
   extendTheme, Grid,
-  GridItem,
+  GridItem, Text,
   Slider, SliderThumb, SliderTrack, VStack
 } from '@chakra-ui/react';
 import React, { Component, useEffect, useState } from 'react';
@@ -57,18 +58,21 @@ class App extends Component{
         >
           <GridItem w="10vw" bg="brand.500">
             <GmpmMenu/>
-            <Center>
-              <VStack w="100%">
-                <Slider mt={8} w="50%" defaultValue={0} min={0} max={2} step={1} onChange={this.updateDraftOption}>
+            <VStack w="100%">
+              <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
+                  <Text fontSize="xx-small" >View settings</Text>
+              </Badge>
+                <Box mt={8} borderRadius="lg" p={4} w="90%" border="1px solid white">
+                <Slider  defaultValue={0} min={0} max={2} step={1} onChange={this.updateDraftOption}>
                   <SliderTrack bg="brand.100">
                   </SliderTrack>
                   <SliderThumb boxSize={4}>
                     <Box color="tomato" as={CgArrowsShrinkH} />
                   </SliderThumb>
                 </Slider>
-                <Box>{this.state.draftOption.text}</Box>
-              </VStack>
-            </Center>
+                <Box fontSize="xs" textAlign="center">{this.state.draftOption.text}</Box>
+              </Box>
+            </VStack>
           </GridItem>
           <GridItem w="90vw"bg="papayawhip">
             <Switch>
