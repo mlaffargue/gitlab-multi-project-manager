@@ -1,12 +1,10 @@
 import {
   Badge,
-  Box,
-  Center, ChakraProvider,
+  Box, Button, ChakraProvider,
   extendTheme, Grid,
-  GridItem, Text,
-  Slider, SliderThumb, SliderTrack, VStack
+  GridItem, Slider, SliderThumb, SliderTrack, Text, VStack
 } from '@chakra-ui/react';
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import { CgArrowsShrinkH } from 'react-icons/cg';
 import {
   BrowserRouter as Router, Route, Switch
@@ -49,6 +47,25 @@ class App extends Component{
     }));
   }
 
+  exportConfiguration = () => {
+    let repositories = (localStorage.getItem('repositories') && JSON.parse(localStorage.getItem('repositories')) ) || [];
+    let projects = (localStorage.getItem('projects') && JSON.parse(localStorage.getItem('projects')) ) || [];
+
+    const blob = new Blob([
+      JSON.stringify({
+        repositories: repositories,
+        projects: projects
+      })
+    ]);
+
+    const element = document.createElement("a");
+    element.href = URL.createObjectURL(blob);
+    element.download = "gmpm_settings_" + new Date().toJSON().slice(0,10).split`-`.join``;
+    document.body.appendChild(element);
+    element.click();
+    element.remove();
+  }
+
   render = () => (
     <ChakraProvider theme={theme}>
     <Router>
@@ -58,15 +75,23 @@ class App extends Component{
         >
           <GridItem w="10vw" bg="brand.500">
             <GmpmMenu/>
-            <VStack w="100%">
+            <VStack w="100%" textAlign="center">
+              <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
+                  <Text fontSize="xx-small" >Configuration</Text>
+              </Badge>
+              <Box mt={8} borderRadius="lg" pl={4} pr={4} w="90%" border="1px solid white">
+                <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
+                <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline">Import</Button>
+              </Box>
+
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
                   <Text fontSize="xx-small" >View settings</Text>
               </Badge>
-                <Box mt={8} borderRadius="lg" p={4} w="90%" border="1px solid white">
+              <Box mt={8} borderRadius="lg" pl={4} pr={4} w="90%" border="1px solid white">
                 <Slider  defaultValue={0} min={0} max={2} step={1} onChange={this.updateDraftOption}>
                   <SliderTrack bg="brand.100">
                   </SliderTrack>
-                  <SliderThumb boxSize={4}>
+                  <SliderThumb boxSize={3}>
                     <Box color="tomato" as={CgArrowsShrinkH} />
                   </SliderThumb>
                 </Slider>

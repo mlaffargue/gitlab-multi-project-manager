@@ -65,7 +65,7 @@ class ProjectInfo extends Component {
 
         return (
             <VStack minW="min-content" maxW="27vw" width="27vw" borderWidth="1px" borderRadius="lg" bgGradient="linear(to-b, blue.700, blue.900)" >
-                <SimpleGrid columns={3}>
+                <SimpleGrid columns={3} w="100%">
                     <Box> </Box>
                     <Box>
                         <Center>
