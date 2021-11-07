@@ -1,10 +1,11 @@
 import {
   Badge,
   Box, Button, ChakraProvider,
-  extendTheme, Grid,
-  GridItem, Slider, SliderThumb, SliderTrack, Text, VStack
+  extendTheme, FormControl, FormLabel, Grid,
+  GridItem, Modal, ModalBody,
+  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Slider, SliderThumb, SliderTrack, Text, Textarea, useToast, useDisclosure, VStack
 } from '@chakra-ui/react';
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { CgArrowsShrinkH } from 'react-icons/cg';
 import {
   BrowserRouter as Router, Route, Switch
@@ -32,6 +33,92 @@ const theme = extendTheme({
 })
 
 
+function ImportModal() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const [settings, setSettings] = useState([]);
+  const initialRef = React.useRef();
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+    try {
+      let parsedSettings = JSON.parse(settings);
+      // TODO: Refactor in a class
+      if (parsedSettings.version === 0) {
+        if (! Array.isArray(parsedSettings.projects)
+          || ! Array.isArray(parsedSettings.repositories)) {
+          toast({
+            title: "Error during import",
+            description: "Didn't manage to parse the configuration, please verify your file.",
+            status: "error",
+            duration: 3000,
+            position: "top",
+            isClosable: true,
+          });
+          return;
+        }
+        // TODO: more checks
+        // Read config and update settings.
+        localStorage.setItem('repositories', JSON.stringify(parsedSettings.repositories));
+        localStorage.setItem('projects', JSON.stringify(parsedSettings.projects));
+        window.location.reload();
+      } else {
+        toast({
+          title: "Error during import",
+          description: "Version is unknown, please verify your configuration file.",
+          status: "error",
+          duration: 3000,
+          position: "top",
+          isClosable: true,
+        });
+        return;
+      }
+    } catch (error) {
+      toast({
+                title: "Error during import",
+                description: "Something went wrong, please verify your configuration file.",
+                status: "error",
+                duration: 3000,
+                position: "top",
+                isClosable: true,
+              });
+      return;
+    }
+    
+
+  }
+
+  return (
+    <>
+      <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={onOpen}>Import</Button>
+      <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>
+          <ModalOverlay />
+          <ModalContent>
+              <form onSubmit={onSubmit} >
+              <ModalHeader>Import</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                  <FormControl id="settingsImport">
+                      <FormLabel>Configuration</FormLabel>
+                      <Textarea ref={initialRef} placeholder="Paste your configuration file" value={settings} onChange={(event) => setSettings(event.target.value)}/>
+                  </FormControl>
+              </ModalBody>
+
+              <ModalFooter>
+              <Button mr={3} onClick={onClose}>
+                  Cancel
+              </Button>
+              <Button type="submit" colorScheme="brand" mr={3}>
+                  Import
+              </Button>
+              </ModalFooter>
+              </form>
+          </ModalContent>
+      </Modal> 
+    </>
+  )
+}
+
 class App extends Component{
   constructor(props) {
     super(props);
@@ -53,6 +140,7 @@ class App extends Component{
 
     const blob = new Blob([
       JSON.stringify({
+        version: 0,
         repositories: repositories,
         projects: projects
       })
@@ -64,6 +152,10 @@ class App extends Component{
     document.body.appendChild(element);
     element.click();
     element.remove();
+  }
+
+  importConfiguration = () => {
+
   }
 
   render = () => (
@@ -81,7 +173,7 @@ class App extends Component{
               </Badge>
               <Box mt={8} borderRadius="lg" pl={4} pr={4} w="90%" border="1px solid white">
                 <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
-                <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline">Import</Button>
+                <ImportModal />
               </Box>
 
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
