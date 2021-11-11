@@ -63,7 +63,7 @@ class ProjectInfo extends Component {
         }
 
         return (
-            <VStack maxW="20vw" width="20vw" borderWidth="1px" borderRadius="lg" bgColor="brand.600" >
+            <VStack maxW="20vw" width="20vw" borderWidth="1px" borderRadius="lg" bgColor="brand.600" mr={2}>
                 <SimpleGrid columns={3} w="100%">
                     <Box> </Box>
                     <Box>

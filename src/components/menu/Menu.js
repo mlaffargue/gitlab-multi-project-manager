@@ -16,14 +16,13 @@ class GmpmMenu extends Component {
             <Box textAlign='center'>
                 <Menu>
                     <MenuButton 
+                        textColor="white"
                         mt={5} 
                         as={IconButton} 
                         icon={<GiHamburgerMenu />} 
                         variant="outline"/>
                     <MenuList>
-                        
                             <GmpmSettings/>
-                            
                     </MenuList>
                 </Menu>
             </Box>);

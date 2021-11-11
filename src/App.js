@@ -1,6 +1,6 @@
 import {
   Badge,
-  Box, Button, ChakraProvider,
+  Box, Button, ChakraProvider, Center,
   extendTheme, FormControl, FormLabel, Grid,
   GridItem, Modal, ModalBody,
   ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Switch, SliderThumb, SliderTrack, Text, Textarea, useToast, useDisclosure, VStack
@@ -180,11 +180,12 @@ class App extends Component{
             h="100vh" 
           templateColumns="repeat(2, 1fr)"
         >
-          <GridItem w="10vw" bg="brand.500">
+          <GridItem w="10vw" bg="brand.600">
+            <Text fontSize="xx-small" align="center">v0.1.0</Text>
             <GmpmMenu/>
             <VStack w="100%" textAlign="center">
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
-                  <Text fontSize="xx-small" >Configuration</Text>
+                  <Text fontSize="xs" >Configuration</Text>
               </Badge>
               <Box mt={8} pl={4} pr={4} w="90%">
                 <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
@@ -192,20 +193,20 @@ class App extends Component{
               </Box>
 
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
-                  <Text fontSize="xx-small" >View settings</Text>
+                  <Text fontSize="xs" >View settings</Text>
               </Badge>
               <Box mt={8} pl={4} pr={4} w="90%">
                 <Switch size="md" isChecked={this.state.draftOption === DraftOptionEnum.DRAFT_ONLY} onChange={(event) => this.updateDraftOption(event.target)} />
-                <Box fontSize="xs" textAlign="center">{this.state.draftOption.text}</Box>
+                <Box fontSize="xs" textColor="white" textAlign="center">{this.state.draftOption.text}</Box>
               </Box>
               
               <Box mt={8} pl={4} pr={4} w="90%">
                 <Switch size="md" isChecked={this.state.projectVisibilityOption === ProjectVisibilityOptionEnum.HIDE_EMPTY} onChange={(event) => this.updateProjectVisibilityOption(event.target)} />
-                <Box fontSize="xs" textAlign="center">{this.state.projectVisibilityOption.text}</Box>
+                <Box fontSize="xs" textColor="white" textAlign="center">{this.state.projectVisibilityOption.text}</Box>
               </Box>
             </VStack>
           </GridItem>
-          <GridItem w="90vw"bg="papayawhip">
+          <GridItem w="90vw"bg="#15202B">
             <RouteSwitch>
               <Route path="/">
                 <MrAnalysisPage draftOption={this.state.draftOption} projectVisibilityOption={this.state.projectVisibilityOption}/>

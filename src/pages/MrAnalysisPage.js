@@ -11,11 +11,10 @@ function AddProjectButton(props) {
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [optionList, setOptionList] = useState([]);
-    let repositories = (localStorage.getItem('repositories') && JSON.parse(localStorage.getItem('repositories')) ) || [];
-    const repositoriesRef = useRef(repositories);
 
     useEffect(() => {
-        let options = repositoriesRef.current.slice();
+        let repositories = (localStorage.getItem('repositories') && JSON.parse(localStorage.getItem('repositories')) ) || [];
+        let options = repositories.slice();
         options = options.map((repository) => <option key={repository.name}>{repository.name}</option>);
         setOptionList(options);
     }, [isOpen]);
