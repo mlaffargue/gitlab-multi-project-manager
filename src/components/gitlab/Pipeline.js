@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import GitlabPipelineMdl from '../../model/gitlab-api/GitlabPipelineMdl';
 import GitlabService from '../../services/gitlab/GitlabService';
 import Job from './Job';
-import JobList from './Job';
 import PipelineSeparator from './PipelineSeparator';
 
 class Pipeline extends Component {
@@ -13,14 +12,14 @@ class Pipeline extends Component {
         this.state = { jobs: [] }
 
         // Get pipelines jobs
-        GitlabService.getPipelineJobs(this.props.project, this.props.pipeline.id).then (
+        GitlabService.getPipelineJobs(this.props.project, this.props.pipeline.id).then(
             (pipelineJobs) => {
                 // Update state
                 this.setState({
                     jobs: pipelineJobs.reverse()
                 });
             }
-        );
+        ).catch(error => {});
     }
     render() {
         const pipeline = new GitlabPipelineMdl(this.props.pipeline);
