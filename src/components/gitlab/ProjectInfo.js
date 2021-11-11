@@ -3,10 +3,11 @@ import Icon from '@chakra-ui/icon';
 import { Badge, Box, Center, Flex, SimpleGrid, VStack, Text } from '@chakra-ui/layout';
 import React, { Component } from 'react';
 import { CgBitbucket, CgTrashEmpty } from 'react-icons/cg';
-import DraftOptionEnum from '../../model/DraftOptionEnum';
+import DraftOptionEnum from '../../model/option/DraftOptionEnum';
 import GitlabProjectInfoMdl from '../../model/gitlab-api/GitlabProjectInfoMdl';
 import GitlabService from '../../services/gitlab/GitlabService';
 import MrInfo from './MrInfo';
+import ProjectVisibilityOptionEnum from '../../model/option/ProjectVisibilityOptionEnum';
 
 class ProjectInfo extends Component {
     constructor(props) {
@@ -14,8 +15,8 @@ class ProjectInfo extends Component {
 
         this.state = {
             projectInfo: new GitlabProjectInfoMdl({}),
-            draftOption: props.draftOption,
-            mergeRequests: []
+            mergeRequests: [],
+            displayed: true
         };
     }
 
@@ -36,16 +37,9 @@ class ProjectInfo extends Component {
                 this.setState((prevState) => ({
                     ...prevState,
                     mergeRequests: mrList
-                })
-            );
+                    })
+                );
         });
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        return {
-            ...prevState,
-            draftOption: nextProps.draftOption
-        };
     }
 
     deleteProject = () => {
@@ -55,16 +49,21 @@ class ProjectInfo extends Component {
     render() {
         const mrComponents = this.state.mergeRequests.map(mr => {
             // Show/Hide depending on mode and draft value
-            if ((this.state.draftOption === DraftOptionEnum.NORMAL && mr.draft) 
-                || (this.state.draftOption === DraftOptionEnum.DRAFT_ONLY && ! mr.draft)) {
+            if ((this.props.draftOption === DraftOptionEnum.NON_DRAFT && mr.draft) 
+                || (this.props.draftOption === DraftOptionEnum.DRAFT_ONLY && !mr.draft)) {
                 return null;
             }
             return <MrInfo key={mr.id} project={this.props.project} mergeRequest={mr}></MrInfo>
             }
-        );
+        ).filter((element) => element !== null);
+
+        if (this.props.projectVisibilityOption === ProjectVisibilityOptionEnum.HIDE_EMPTY
+            && mrComponents.length === 0) {
+            return null;
+        }
 
         return (
-            <VStack minW="min-content" maxW="27vw" width="27vw" borderWidth="1px" borderRadius="lg" bgGradient="linear(to-b, blue.700, blue.900)" >
+            <VStack maxW="20vw" width="20vw" borderWidth="1px" borderRadius="lg" bgColor="brand.600" >
                 <SimpleGrid columns={3} w="100%">
                     <Box> </Box>
                     <Box>
@@ -84,7 +83,7 @@ class ProjectInfo extends Component {
                             onClick={this.deleteProject}/>
                     </Box>
                 </SimpleGrid>
-                <Box p="3" >
+                <Box p="3" w="100%">
                     {mrComponents}
                 </Box>
            </VStack>

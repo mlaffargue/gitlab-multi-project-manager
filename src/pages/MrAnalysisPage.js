@@ -1,7 +1,7 @@
 import { AddIcon } from '@chakra-ui/icons';
 import {
     Button, Flex, FormControl, FormLabel, IconButton, Input, Modal, ModalBody,
-    ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spacer, useDisclosure, useToast, Wrap
+    ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spacer, useDisclosure, useToast, Wrap, WrapItem
 } from "@chakra-ui/react";
 import React, { Component, useEffect, useRef, useState } from 'react';
 import ProjectInfo from '../components/gitlab/ProjectInfo';
@@ -61,7 +61,7 @@ function AddProjectButton(props) {
         <>
         
         <IconButton
-                    mt={5}
+                    mt={2}
                     mr={5}
                     colorScheme="brand"
                     icon={<AddIcon />}
@@ -107,17 +107,10 @@ class MrAnalysisPage extends Component {
         super(props);
         const projects = (localStorage.getItem('projects') && JSON.parse(localStorage.getItem('projects')) ) || [];
         this.state = { 
-            projects: projects,
-            draftOption: props.draftOption
+            projects: projects
         }
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        return {
-            ...prevState,
-            draftOption: nextProps.draftOption
-        };
-    }
 
     updateProjects = (newProjectList) => {
         this.setState(prevState => ({
@@ -140,13 +133,17 @@ class MrAnalysisPage extends Component {
     render() {
         const projectCmps = this.state.projects.map(
             (project) => {
-                    return <ProjectInfo key={project.id} project={project} deleteProject={this.deleteProject} draftOption={this.state.draftOption}/>
+                    return (
+                        <WrapItem margin="0px !important">
+                            <ProjectInfo key={project.id} project={project} deleteProject={this.deleteProject} draftOption={this.props.draftOption} projectVisibilityOption={this.props.projectVisibilityOption}/>
+                        </WrapItem>
+                    );
             });
 
         return (
             <>
                 <Flex>
-                    <Wrap>
+                    <Wrap mt={8} ml={4}>
                         {projectCmps}
                     </Wrap>
                     <Spacer/>

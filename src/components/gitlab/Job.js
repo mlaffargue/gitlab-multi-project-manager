@@ -3,36 +3,25 @@ import React, { Component } from 'react';
 import GitlabJobMdl from '../../model/gitlab-api/GitlabJobMdl';
 import IconMap from '../IconMap';
 
-class JobList extends Component {
+class Job extends Component {
     constructor(props) {
         super(props);
         this.state = {  }
     }
 
-    buildJobsComponents = (jobs) => {
-        // Transform jobs to GUI components
-        return jobs.map(job => {
-            const jobMdl = new GitlabJobMdl(job);
-            const icon = this.getIcon(jobMdl.status);
-            return (
-                <Box key={jobMdl.id}>
-                    <Icon as={IconMap.toIcon(icon.type)} 
-                            color={icon.color} 
-                            boxSize={5} 
-                            title={jobMdl.name + " " + jobMdl.status}/>
-                </Box>);
-            }
-        );
-    }
-
     render() {
-        const jobsComponent = this.buildJobsComponents(this.props.jobs);
+        const jobMdl = new GitlabJobMdl(this.props.job);
+        const icon = this.getIcon(jobMdl.status);
 
         // Show them horizontally
         return (
-        <HStack spacing="0px">
-            {jobsComponent}
-        </HStack> );
+            <Box key={jobMdl.id}>
+                <Icon as={IconMap.toIcon(icon.type)} 
+                        color={icon.color} 
+                        boxSize={5} 
+                        title={jobMdl.name + " " + jobMdl.status}/>
+            </Box>
+        );
     }
 
     /*
@@ -72,4 +61,4 @@ class JobList extends Component {
 }
 
  
-export default JobList;
+export default Job;

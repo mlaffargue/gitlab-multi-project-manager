@@ -1,18 +1,30 @@
 import { Box, HStack } from '@chakra-ui/layout';
 import React, { Component } from 'react';
 import GitlabPipelineMdl from '../../model/gitlab-api/GitlabPipelineMdl';
-import JobList from './JobList';
+import GitlabService from '../../services/gitlab/GitlabService';
+import Job from './Job';
+import JobList from './Job';
 import PipelineSeparator from './PipelineSeparator';
 
 class Pipeline extends Component {
     constructor(props) {
         super(props);
-        this.state = {  }
-    }
 
+        this.state = { jobs: [] }
+
+        // Get pipelines jobs
+        GitlabService.getPipelineJobs(this.props.project, this.props.pipeline.id).then (
+            (pipelineJobs) => {
+                // Update state
+                this.setState({
+                    jobs: pipelineJobs.reverse()
+                });
+            }
+        );
+    }
     render() {
         const pipeline = new GitlabPipelineMdl(this.props.pipeline);
-        const jobs = this.props.jobs;
+        const jobsComponent = this.state.jobs.map((job) => <Job job={job} />);
 
         const separator = this.props.hasSeparator ? <PipelineSeparator/> : null;
 
@@ -22,7 +34,9 @@ class Pipeline extends Component {
                     <Box fontSize="smaller">
                         {new Date(pipeline.updated_at).toLocaleString()}
                     </Box>
-                    <JobList jobs={jobs}/>
+                    <HStack spacing="0px">
+                        {jobsComponent}
+                    </HStack>
                 </HStack>
                 {separator}
             </Box>

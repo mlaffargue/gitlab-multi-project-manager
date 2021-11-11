@@ -3,15 +3,16 @@ import {
   Box, Button, ChakraProvider,
   extendTheme, FormControl, FormLabel, Grid,
   GridItem, Modal, ModalBody,
-  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Slider, SliderThumb, SliderTrack, Text, Textarea, useToast, useDisclosure, VStack
+  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Switch, SliderThumb, SliderTrack, Text, Textarea, useToast, useDisclosure, VStack
 } from '@chakra-ui/react';
 import React, { Component, useState } from 'react';
 import { CgArrowsShrinkH } from 'react-icons/cg';
 import {
-  BrowserRouter as Router, Route, Switch
+  BrowserRouter as Router, Route, Switch as RouteSwitch
 } from "react-router-dom";
 import GmpmMenu from './components/menu/Menu';
-import DraftOptionEnum from './model/DraftOptionEnum';
+import DraftOptionEnum from './model/option/DraftOptionEnum';
+import ProjectVisibilityOptionEnum from './model/option/ProjectVisibilityOptionEnum';
 import MrAnalysisPage from './pages/MrAnalysisPage';
 
 
@@ -31,6 +32,7 @@ const theme = extendTheme({
     }
   },
 })
+// theme.colors.brand = theme.colors.messenger;
 
 
 function ImportModal() {
@@ -123,15 +125,32 @@ class App extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      draftOption: DraftOptionEnum.NORMAL
+      draftOption:(localStorage.getItem('draftOption') &&  DraftOptionEnum.fromValue(JSON.parse(localStorage.getItem('draftOption'))) ) || DraftOptionEnum.NON_DRAFT,
+      projectVisibilityOption: (localStorage.getItem('projectVisibilityOption') &&  ProjectVisibilityOptionEnum.fromValue(JSON.parse(localStorage.getItem('projectVisibilityOption'))) ) || ProjectVisibilityOptionEnum.SHOW_EMPTY,
+
     }
   }
 
-  updateDraftOption = (idx) => {
+  updateDraftOption = (target) => {
     this.setState(prevState => ({
       ...prevState,
-      draftOption: DraftOptionEnum.fromIdx(idx)
+      draftOption: DraftOptionEnum.fromValue(target.checked)
     }));
+
+    localStorage.setItem('draftOption', JSON.stringify(target.checked));
+
+    target.isChecked = target.checked;
+  }
+
+  updateProjectVisibilityOption = (target) => {
+    this.setState(prevState => ({
+      ...prevState,
+      projectVisibilityOption: ProjectVisibilityOptionEnum.fromValue(target.checked)
+    }));
+
+    localStorage.setItem('projectVisibilityOption', JSON.stringify(target.checked));
+    
+    target.isChecked = target.checked;
   }
 
   exportConfiguration = () => {
@@ -154,10 +173,6 @@ class App extends Component{
     element.remove();
   }
 
-  importConfiguration = () => {
-
-  }
-
   render = () => (
     <ChakraProvider theme={theme}>
     <Router>
@@ -171,7 +186,7 @@ class App extends Component{
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
                   <Text fontSize="xx-small" >Configuration</Text>
               </Badge>
-              <Box mt={8} borderRadius="lg" pl={4} pr={4} w="90%" border="1px solid white">
+              <Box mt={8} pl={4} pr={4} w="90%">
                 <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
                 <ImportModal />
               </Box>
@@ -179,24 +194,23 @@ class App extends Component{
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
                   <Text fontSize="xx-small" >View settings</Text>
               </Badge>
-              <Box mt={8} borderRadius="lg" pl={4} pr={4} w="90%" border="1px solid white">
-                <Slider  defaultValue={0} min={0} max={2} step={1} onChange={this.updateDraftOption}>
-                  <SliderTrack bg="brand.100">
-                  </SliderTrack>
-                  <SliderThumb boxSize={3}>
-                    <Box color="tomato" as={CgArrowsShrinkH} />
-                  </SliderThumb>
-                </Slider>
+              <Box mt={8} pl={4} pr={4} w="90%">
+                <Switch size="md" isChecked={this.state.draftOption === DraftOptionEnum.DRAFT_ONLY} onChange={(event) => this.updateDraftOption(event.target)} />
                 <Box fontSize="xs" textAlign="center">{this.state.draftOption.text}</Box>
+              </Box>
+              
+              <Box mt={8} pl={4} pr={4} w="90%">
+                <Switch size="md" isChecked={this.state.projectVisibilityOption === ProjectVisibilityOptionEnum.HIDE_EMPTY} onChange={(event) => this.updateProjectVisibilityOption(event.target)} />
+                <Box fontSize="xs" textAlign="center">{this.state.projectVisibilityOption.text}</Box>
               </Box>
             </VStack>
           </GridItem>
           <GridItem w="90vw"bg="papayawhip">
-            <Switch>
+            <RouteSwitch>
               <Route path="/">
-                <MrAnalysisPage draftOption={this.state.draftOption}/>
+                <MrAnalysisPage draftOption={this.state.draftOption} projectVisibilityOption={this.state.projectVisibilityOption}/>
               </Route>
-            </Switch>
+            </RouteSwitch>
           </GridItem>
         </Grid>
       </Router>

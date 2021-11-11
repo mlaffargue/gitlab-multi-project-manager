@@ -1,3 +1,4 @@
+import GitlabApprovalMdl from "./GitlabApprovalMdl";
 import GitlabUserMdl from "./GitlabUserMdl";
 
 class GitlabMrInfoMdl {
@@ -20,7 +21,7 @@ class GitlabMrInfoMdl {
      
         // Added
         this.lastPipeline={};
-        this.approval={};
+        this.approval=null;
 
         obj && Object.assign(this, obj);
     }

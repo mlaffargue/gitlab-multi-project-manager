@@ -10,27 +10,27 @@ class PipelineAccordion extends Component {
         super(props);
         this.state = { 
             pipelinesPerPipelineIdMap: props.pipelinesPerPipelineIdMap,
-            jobsPerPipelineIdMap: props.jobsPerPipelineIdMap
          }
     }
     
     static getDerivedStateFromProps(nextProps, prevState) {
         return {
             ...prevState,
-            pipelinesPerPipelineIdMap: nextProps.pipelinesPerPipelineIdMap,
-            jobsPerPipelineIdMap: nextProps.jobsPerPipelineIdMap
+            pipelinesPerPipelineIdMap: nextProps.pipelinesPerPipelineIdMap
         };
     }
 
-    createPipelinesCmps = (latestPipelineJobListCmps, othersPipelinesJobListCmps) => {      
+    createPipelinesCmps = (latestPipeline, otherPipelines) => {      
         let idx = 0;
         
-        new Map([...this.state.jobsPerPipelineIdMap].sort((a, b) => b[1] - a[1]))
-            .forEach( (jobs, pipelineId) => {
-            const pipeline = new GitlabPipelineMdl(this.state.pipelinesPerPipelineIdMap.get(pipelineId));
-            const currentJobListCmps = (idx === 0) ? latestPipelineJobListCmps : othersPipelinesJobListCmps;
+        new Map([...this.state.pipelinesPerPipelineIdMap].sort((a, b) => b[1] - a[1]))
+            .forEach( (pipeline) => {
+            const currentJobListCmps = (idx === 0) ? latestPipeline : otherPipelines;
+            // No separator after first and last
+            const hasSeparator = (idx !== 0 && idx !== this.state.pipelinesPerPipelineIdMap.size-1)
+
             currentJobListCmps.push(
-                <Pipeline key={pipeline.id} pipeline={pipeline} jobs={jobs} hasSeparator={idx !== 0 && idx !== this.state.jobsPerPipelineIdMap.size-1}/>
+                <Pipeline key={pipeline.id} pipeline={pipeline} project={this.props.project} hasSeparator={hasSeparator}/>
             )
             idx++;
         });
@@ -38,17 +38,17 @@ class PipelineAccordion extends Component {
 
     render() {
         // Latest job component
-        const latestPipelineJobListCmps = [];
+        const latestPipeline = [];
         // Other jobs components
-        const othersPipelinesJobListCmps = [];
+        const otherPipelines = [];
 
         // Create pipelines components
-        this.createPipelinesCmps(latestPipelineJobListCmps, othersPipelinesJobListCmps);
+        this.createPipelinesCmps(latestPipeline, otherPipelines);
 
         // Render optional other pipelines
-        const renderedOtherPipelines = (othersPipelinesJobListCmps.length > 0) ? 
+        const renderedOtherPipelines = (otherPipelines.length > 0) ? 
                 <AccordionPanel pb={4} bgColor="brand.50" >
-                    {othersPipelinesJobListCmps}
+                    {otherPipelines}
                 </AccordionPanel>
             : null;
         
@@ -57,9 +57,9 @@ class PipelineAccordion extends Component {
                 <AccordionItem border="1px solid black" mb={2}>
                     <AccordionButton>
                         <Box flex="1" textAlign="left">
-                            {latestPipelineJobListCmps}
+                            {latestPipeline}
                         </Box>
-                        { (othersPipelinesJobListCmps.length > 0) ? <AccordionIcon /> : null }
+                        { (otherPipelines.length > 0) ? <AccordionIcon /> : null }
                     </AccordionButton>
                     {renderedOtherPipelines}
                 </AccordionItem>    

@@ -55,7 +55,7 @@ const GitlabService = {
      * @returns {GitlabProjectInfoMdl}
      */
     getMRApprovals: function(project, mrId) {
-        return getApi(project.repository).MergeRequests.approvals(project.id, {
+        return getApi(project.repository).MergeRequestApprovals.configuration(project.id, {
             mergerequestIid: mrId
         });
     },
