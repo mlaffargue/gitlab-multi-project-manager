@@ -38,13 +38,12 @@ class PipelineAccordion extends Component {
         }
       }
 
-    getPipelineComponent = (pipelines) => {
+    getPipelineComponent = (pipelines, idx = 0) => {
         if (! Array.isArray(pipelines)) {
             pipelines = [pipelines];
         }
 
         const pipelineCmps = []  ;
-        let idx = 0;
 
         pipelines
             .forEach( (pipeline) => {
@@ -78,7 +77,7 @@ class PipelineAccordion extends Component {
                         </AccordionButton>
                         { isExpanded ? (
                             <AccordionPanel pb={4} bgColor="brand.50" >
-                                {this.getPipelineComponent(this.state.otherPipelines)}
+                                {this.getPipelineComponent(this.state.otherPipelines, 1)}
                             </AccordionPanel>
                             ) : (null)
                         }

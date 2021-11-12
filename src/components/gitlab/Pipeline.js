@@ -27,7 +27,7 @@ class Pipeline extends Component {
 
     render() {
         const pipeline = new GitlabPipelineMdl(this.props.pipeline);
-        const jobsComponent = this.state.jobs.map((job) => <Job job={job} />);
+        const jobsComponent = this.state.jobs.map((job) => <Job key={job.id} job={job} />);
 
         const separator = this.props.hasSeparator ? <PipelineSeparator/> : null;
 

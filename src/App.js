@@ -35,7 +35,7 @@ const theme = extendTheme({
 // theme.colors.brand = theme.colors.messenger;
 
 
-function ImportModal() {
+function ImportModalButton() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [settings, setSettings] = useState([]);
@@ -63,7 +63,7 @@ function ImportModal() {
         // Read config and update settings.
         localStorage.setItem('repositories', JSON.stringify(parsedSettings.repositories));
         localStorage.setItem('projects', JSON.stringify(parsedSettings.projects));
-        window.location.reload();
+        window.location.reload(false);
       } else {
         toast({
           title: "Error during import",
@@ -92,7 +92,7 @@ function ImportModal() {
 
   return (
     <>
-      <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={onOpen}>Import</Button>
+      <Button m={2} size="xs" textColor="brand.50" variant="outline" onClick={onOpen}>Import</Button>
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>
           <ModalOverlay />
           <ModalContent>
@@ -124,11 +124,16 @@ function ImportModal() {
 class App extends Component{
   constructor(props) {
     super(props);
+    if (!localStorage.getItem('repositories')) {
+      this.importExample();
+    }
+    
     this.state = {
       draftOption:(localStorage.getItem('draftOption') &&  DraftOptionEnum.fromValue(JSON.parse(localStorage.getItem('draftOption'))) ) || DraftOptionEnum.NON_DRAFT,
       projectVisibilityOption: (localStorage.getItem('projectVisibilityOption') &&  ProjectVisibilityOptionEnum.fromValue(JSON.parse(localStorage.getItem('projectVisibilityOption'))) ) || ProjectVisibilityOptionEnum.SHOW_EMPTY,
-
     }
+
+    
   }
 
   updateDraftOption = (target) => {
@@ -151,6 +156,39 @@ class App extends Component{
     localStorage.setItem('projectVisibilityOption', JSON.stringify(target.checked));
     
     target.isChecked = target.checked;
+  }
+
+  importExample = (reload) => {
+    const parsedSettings = {
+        "version": 0,
+        "repositories": [{
+                "name": "gitlab.com",
+                "token": "",
+                "url": "https://gitlab.com"
+            }
+        ],
+        "projects": [{
+                "id": "2396699",
+                "repository": "gitlab.com"
+            },{
+                "id": "17471616",
+                "repository": "gitlab.com"
+            }, {
+                "id": "6722790",
+                "repository": "gitlab.com"
+            }, {
+                "id": "1507906",
+                "repository": "gitlab.com"
+            }
+        ]
+    };
+    
+    localStorage.setItem('repositories', JSON.stringify(parsedSettings.repositories));
+    localStorage.setItem('projects', JSON.stringify(parsedSettings.projects));
+
+    if (reload) {
+      window.location.reload(false);
+    }
   }
 
   exportConfiguration = () => {
@@ -188,8 +226,9 @@ class App extends Component{
                   <Text fontSize="xs" >Configuration</Text>
               </Badge>
               <Box mt={8} pl={4} pr={4} w="90%">
-                <Button colorScheme="brand" m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
-                <ImportModal />
+                <Button  m={2} size="xs" textColor="brand.50" variant="outline" onClick={this.exportConfiguration}>Export</Button>
+                <ImportModalButton />
+                <Button m={2} size="xs" textColor="lightgreen" variant="outline" onClick={this.importExample}>Import example</Button>
               </Box>
 
               <Badge w="90%" mt={4} textAlign="center" borderRadius="lg" px="2" colorScheme="yellow" variant="outline">
