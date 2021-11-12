@@ -1,4 +1,4 @@
-import { Box, HStack } from '@chakra-ui/layout';
+import { Box, HStack,Text } from '@chakra-ui/layout';
 import React, { Component } from 'react';
 import GitlabPipelineMdl from '../../model/gitlab-api/GitlabPipelineMdl';
 import GitlabService from '../../services/gitlab/GitlabService';
@@ -9,7 +9,10 @@ class Pipeline extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { jobs: [] }
+        this.state = { 
+            jobs: [],
+            jobsFetchError: false
+        };
 
     }
 
@@ -22,7 +25,13 @@ class Pipeline extends Component {
                     jobs: pipelineJobs.reverse()
                 });
             }
-        ).catch(error => {});
+        ).catch((reason) => {
+            this.setState((prevState) => ({
+                    ...prevState,
+                    jobsFetchError: true
+                })
+            );
+        });
     }
 
     render() {
@@ -38,7 +47,13 @@ class Pipeline extends Component {
                         {new Date(pipeline.updated_at).toLocaleString()}
                     </Box>
                     <HStack spacing="0px">
-                        {jobsComponent}
+                        {
+                            this.state.jobsFetchError ? (
+                                <Text fontSize="xs" textColor="red">No job information</Text>
+                            ) : (
+                                jobsComponent
+                            )
+                        }
                     </HStack>
                 </HStack>
                 {separator}
