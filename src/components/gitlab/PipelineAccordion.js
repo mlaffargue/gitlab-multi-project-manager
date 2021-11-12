@@ -8,60 +8,82 @@ import Pipeline from './Pipeline';
 class PipelineAccordion extends Component {
     constructor(props) {
         super(props);
-        this.state = { 
-            pipelinesPerPipelineIdMap: props.pipelinesPerPipelineIdMap,
-         }
-    }
-    
-    static getDerivedStateFromProps(nextProps, prevState) {
-        return {
-            ...prevState,
-            pipelinesPerPipelineIdMap: nextProps.pipelinesPerPipelineIdMap
+
+        this.state = {
+            latestPipeline: null,
+            otherPipelines: []
         };
     }
 
-    createPipelinesCmps = (latestPipeline, otherPipelines) => {      
-        let idx = 0;
-        
-        new Map([...this.state.pipelinesPerPipelineIdMap].sort((a, b) => b[1] - a[1]))
-            .forEach( (pipeline) => {
-            const currentJobListCmps = (idx === 0) ? latestPipeline : otherPipelines;
-            // No separator after first and last
-            const hasSeparator = (idx !== 0 && idx !== this.state.pipelinesPerPipelineIdMap.size-1)
+    componentDidUpdate(prevProps) {
+        if (prevProps.pipelinesPerPipelineIdMap !== this.props.pipelinesPerPipelineIdMap) {
+            // Set latest pipeline
+            const mapIter = this.props.pipelinesPerPipelineIdMap.values();
 
-            currentJobListCmps.push(
-                <Pipeline key={pipeline.id} pipeline={pipeline} project={this.props.project} hasSeparator={hasSeparator}/>
-            )
-            idx++;
-        });
+            const latestPipeline = mapIter.next().value;       
+            const otherPipelines = [];
+
+            let otherPipelineIterator = mapIter.next();
+            while (!otherPipelineIterator.done) {
+                otherPipelines.push(otherPipelineIterator.value);
+                otherPipelineIterator = mapIter.next();
+            }
+
+            this.setState((prevState) => ({
+                    ...prevState,
+                    latestPipeline: latestPipeline,
+                    otherPipelines: otherPipelines
+                })
+            );
+        }
+      }
+
+    getPipelineComponent = (pipelines) => {
+        if (! Array.isArray(pipelines)) {
+            pipelines = [pipelines];
+        }
+
+        const pipelineCmps = []  ;
+        let idx = 0;
+
+        pipelines
+            .forEach( (pipeline) => {
+                // No separator after first and last
+                const hasSeparator = (idx !== 0 && idx !== this.props.pipelinesPerPipelineIdMap.size-1)
+
+                pipelineCmps.push(
+                    <Pipeline key={pipeline.id} pipeline={pipeline} project={this.props.project} hasSeparator={hasSeparator}/>
+                )
+                idx++;
+            });
+
+        return pipelineCmps;
     }
 
     render() {
-        // Latest job component
-        const latestPipeline = [];
-        // Other jobs components
-        const otherPipelines = [];
-
-        // Create pipelines components
-        this.createPipelinesCmps(latestPipeline, otherPipelines);
-
-        // Render optional other pipelines
-        const renderedOtherPipelines = (otherPipelines.length > 0) ? 
-                <AccordionPanel pb={4} bgColor="brand.50" >
-                    {otherPipelines}
-                </AccordionPanel>
-            : null;
+        if (! this.state.latestPipeline) {
+            return null;
+        }
         
         return (
             <Accordion allowMultiple>
                 <AccordionItem border="1px solid black" mb={2}>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left">
-                            {latestPipeline}
-                        </Box>
-                        { (otherPipelines.length > 0) ? <AccordionIcon /> : null }
-                    </AccordionButton>
-                    {renderedOtherPipelines}
+                {({ isExpanded }) => (
+                    <>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left">
+                                {this.getPipelineComponent(this.state.latestPipeline)}
+                            </Box>
+                            { (this.state.otherPipelines.length > 0) ? <AccordionIcon /> : null }
+                        </AccordionButton>
+                        { isExpanded ? (
+                            <AccordionPanel pb={4} bgColor="brand.50" >
+                                {this.getPipelineComponent(this.state.otherPipelines)}
+                            </AccordionPanel>
+                            ) : (null)
+                        }
+                    </>
+                )}
                 </AccordionItem>    
             </Accordion>
         );

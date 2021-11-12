@@ -11,6 +11,9 @@ class Pipeline extends Component {
 
         this.state = { jobs: [] }
 
+    }
+
+    componentDidMount() {
         // Get pipelines jobs
         GitlabService.getPipelineJobs(this.props.project, this.props.pipeline.id).then(
             (pipelineJobs) => {
@@ -21,6 +24,7 @@ class Pipeline extends Component {
             }
         ).catch(error => {});
     }
+
     render() {
         const pipeline = new GitlabPipelineMdl(this.props.pipeline);
         const jobsComponent = this.state.jobs.map((job) => <Job job={job} />);

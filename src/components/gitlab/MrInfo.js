@@ -16,13 +16,13 @@ class MrInfo extends Component {
         super(props);
         this.state = { 
             pipelinesPerPipelineId:new Map(),
+            pipelinesFetchError: false,
             approval: null
          }
     }
 
 
     componentDidMount() {
-        const pipelinesPerPipelineId = new Map();
         
         GitlabService.getMRApprovals(this.props.project, this.props.mergeRequest.iid)
             .then((approval) => {
@@ -32,27 +32,34 @@ class MrInfo extends Component {
                     })
                 );
             }
-        );
+        ).catch((reason) => {
+            // TODO: Error on approval fetch
+        });
 
         GitlabService.getMRPipelines(this.props.project, this.props.mergeRequest.iid)
             .then((pipelines) => {
+                const retrievedPipelinesMap = new Map();
                 // keep pipelines per pipelineId in map 
-                pipelines.forEach(pipeline => pipelinesPerPipelineId.set(pipeline.id,pipeline));
-                
+                pipelines.forEach(pipeline => retrievedPipelinesMap.set(pipeline.id,pipeline));
+
                 // Update state
                 this.setState((prevState) => ({
                     ...prevState,
-                    pipelinesPerPipelineId: pipelinesPerPipelineId
+                    pipelinesPerPipelineId: new Map([...retrievedPipelinesMap].sort((a, b) => b[1] - a[1]))
                     })
                 );
-            }
-        );
+            }).catch((reason) => {
+                this.setState((prevState) => ({
+                        ...prevState,
+                        pipelinesFetchError: true
+                    })
+                );
+            });
         
     }
 
     render() {
         const mergeRequest = new GitlabMrInfoMdl(this.props.mergeRequest);
-        const pipelinesPerPipelineIdMap = this.state.pipelinesPerPipelineId;
        
         return (
                 <Box borderRadius="md" mb={1} backgroundColor="brand.100" colorScheme="brand">
@@ -71,7 +78,12 @@ class MrInfo extends Component {
                             </Text>
                         </Flex>
                         <Box>
-                            <PipelineAccordion project={this.props.project} pipelinesPerPipelineIdMap={pipelinesPerPipelineIdMap}/>
+                            { (this.state.pipelinesFetchError) ? (
+                                    <Text textColor="red">Error loading pipelines</Text>
+                                ) : (
+                                    <PipelineAccordion project={this.props.project} pipelinesPerPipelineIdMap={this.state.pipelinesPerPipelineId}/>
+                                )
+                            }
                         </Box>
                         <Approval approval={this.state.approval} />
                     </Box>

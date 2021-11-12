@@ -10,22 +10,15 @@ class Approval extends Component {
         this.state = {  }
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        return {
-            ...prevState,
-            approval: nextProps.approval
-        };
-    }
-
     render() {
-        const approval = new GitlabApprovalMdl(this.state.approval);
+        const approval = new GitlabApprovalMdl(this.props.approval);
         if (! approval?.approved_by.length > 0) {
             return null;
         }
         
         return (    
             <>
-                 <Badge colorScheme="green" fontSize="x-small" borderRadius="full"><Icon color="brand.700" mr={1} as={GiStamper} boxSize={4} borderRadius="full" bgColor="green.200"/>Approved by {this.state.approval.approved_by.map((approvedBy) => approvedBy.user.name).join(',')}</Badge>
+                 <Badge colorScheme="green" fontSize="x-small" borderRadius="full"><Icon color="brand.700" mr={1} as={GiStamper} boxSize={4} borderRadius="full" bgColor="green.200"/>Approved by {this.props.approval.approved_by.map((approvedBy) => approvedBy.user.name).join(',')}</Badge>
             </>      
         );
     }
