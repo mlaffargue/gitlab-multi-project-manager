@@ -5,6 +5,7 @@ import { Tag } from '@chakra-ui/tag';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { CgArrowLongRightR, CgComment } from 'react-icons/cg';
+import { MdOutlineSdCardAlert } from 'react-icons/md';
 import { FiExternalLink } from 'react-icons/fi';
 import GitlabMrInfoMdl from '../../model/gitlab-api/GitlabMrInfoMdl';
 import GitlabService from '../../services/gitlab/GitlabService';
@@ -96,7 +97,9 @@ class MrInfo extends Component {
                             </Flex>
                         </Box>
                         <Box  p={0} m={0} flexGrow={0} >
-                            <Icon mr={2} as={CgComment} textColor={this.state.latestNoteUpdateAlert ? "red" : ""} cursor="pointer" title={this.state.latestNoteUpdate}/>
+                            {(this.state.latestNoteUpdate) ?
+                              (<Icon mr={2} as={CgComment} textColor={this.state.latestNoteUpdateAlert ? "red" : ""} cursor="pointer" title={this.state.latestNoteUpdate}/>)
+                            : (<Icon mr={2} as={MdOutlineSdCardAlert} textColor="red" title="Couldn't load discussions. (Authorization ?)"/>) }
                         </Box>
                     </Flex>
                     <Box padding={1} width="100%">
