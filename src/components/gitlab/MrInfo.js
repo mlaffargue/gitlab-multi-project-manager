@@ -2,10 +2,10 @@ import Icon from '@chakra-ui/icon';
 import { Badge, Box, Center, Link, Text, Spacer,VStack } from '@chakra-ui/layout';
 import { Flex } from '@chakra-ui/react';
 import { Tag } from '@chakra-ui/tag';
+import moment from 'moment';
 import React, { Component } from 'react';
 import { CgArrowLongRightR, CgComment } from 'react-icons/cg';
 import { FiExternalLink } from 'react-icons/fi';
-import GitlabApprovalMdl from '../../model/gitlab-api/GitlabApprovalMdl';
 import GitlabMrInfoMdl from '../../model/gitlab-api/GitlabMrInfoMdl';
 import GitlabService from '../../services/gitlab/GitlabService';
 import Approval from './Approval';
@@ -18,7 +18,9 @@ class MrInfo extends Component {
             pipelinesPerPipelineId:new Map(),
             pipelinesFetchError: false,
             approval: null,
-            discussions: []
+            notes: [],
+            latestNoteUpdate: null,
+            latestNoteUpdateAlert: false
          }
     }
 
@@ -38,13 +40,20 @@ class MrInfo extends Component {
 
         GitlabService.getMRDiscussions(this.props.project, this.props.mergeRequest.iid)
         .then((discussions) => {
-                 this.setState((prevState) => ({
-                    ...prevState,
-                    discussions: discussions
-                    })
-                );
-            }
-        ).catch((reason) => {
+            const concatNotes = (previousValue, currentValue) =>[...previousValue, ...currentValue.notes];
+            // Get last note update
+            let notes = discussions.reduce(concatNotes, []);
+            notes.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+            const latestUpdate = (notes.length > 0) ? new Date(notes[0].updated_at) : null;
+            
+            this.setState((prevState) => ({
+                ...prevState,
+                notes: notes,
+                latestNoteUpdate: latestUpdate ? latestUpdate.toLocaleString() : null,
+                latestNoteUpdateAlert: latestUpdate ? moment(latestUpdate).isAfter(moment().subtract(2, 'hours')) : false // Within last 2 hours?
+                })
+            );
+        }).catch((reason) => {
             // TODO: Error on discussions fetch
         });
 
@@ -87,7 +96,7 @@ class MrInfo extends Component {
                             </Flex>
                         </Box>
                         <Box  p={0} m={0} flexGrow={0} >
-                            <Icon  as={CgComment}/>
+                            <Icon mr={2} as={CgComment} textColor={this.state.latestNoteUpdateAlert ? "red" : ""} cursor="pointer" title={this.state.latestNoteUpdate}/>
                         </Box>
                     </Flex>
                     <Box padding={1} width="100%">
