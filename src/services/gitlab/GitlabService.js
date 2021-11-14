@@ -24,7 +24,6 @@ const GitlabService = {
     getProjectInfo: function(project) {
         return getApi(project.repository).Projects.show(project.id);
     },
-
     /**
      * 
      * @param {ProjectMdl} project
@@ -46,6 +45,16 @@ const GitlabService = {
      */
     getMRPipelines: function(project, mrId) {
         return getApi(project.repository).MergeRequests.pipelines(project.id, mrId);
+    },
+
+    /**
+     * 
+     * @param {ProjectMdl} project
+     * @param {Number} mrId
+     * @returns {}
+     */
+     getMRDiscussions: function(project, mrId) {
+        return getApi(project.repository).MergeRequestDiscussions.all(project.id, mrId);
     },
 
     /**
